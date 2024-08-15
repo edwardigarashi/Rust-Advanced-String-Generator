@@ -1,7 +1,15 @@
 [package]
-name = "rust_advanced_string_generator"
+name = "advanced_string_generator"
 version = "0.1.0"
 edition = "2021"
+authors = ["Edward Igarashi <info@igarashi.net>"] # Your name and email
+description = "A command-line tool for generating strings based on customizable regex patterns."
+license = "MIT" # Your chosen license, such as MIT, Apache-2.0, etc.
+repository = "https://github.com/edwardigarashi/Rust-Advanced-String-Generator"
+documentation = "https://igarashi.net/rust-advanced-string-generator/"
+readme = "README.md" # Path to your README file
+keywords = ["regex", "generator", "cli", "rust"]
+categories = ["command-line-utilities", "text-processing", "development-tools::build-systems"]
 
 [lib]
 crate-type = ["cdylib", "rlib"]
