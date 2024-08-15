@@ -179,7 +179,3 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## Contributing
 
 Contributions are welcome! Please submit a pull request or create an issue to report bugs or suggest features.
-
----
-This `README.md` file provides comprehensive documentation for the `RegexGenerator` project, including installation instructions, usage examples, a detailed list of supported patterns, and testing instructions.
-
