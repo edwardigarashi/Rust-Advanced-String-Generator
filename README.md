@@ -85,18 +85,20 @@ run();
 | `\D`     | Any non-digit character.                                                                       | `\D\D`            | `AB`, `--`             |
 | `\W`     | Any non-word character.                                                                        | `\W\W`            | `**`, `@#`             |
 | `\S`     | Any non-whitespace character.                                                                  | `\S\S\S`          | `abc`, `a1b`           |
-| `{n,m}`  | Match between `n` and `m` times.                                                               | `\d{2,4}`         | `12`, `4321`           |
-| `[abc]`  | Match any one of the characters `a`, `b`, or `c`.                                              | `[abc]{3}`        | `abc`, `cab`           |
-| `[^abc]` | Match any character except `a`, `b`, or `c`.                                                   | `[^abc]{3}`       | `xyz`, `123`           |
-| `[a-z]`  | Match any character in the range from `a` to `z`.                                              | `[a-z]{3}`        | `abc`, `xyz`           |
-| `\i+`    | Insert an incrementing value, starting from the specified value and increasing with each use.  | `\i+\d\d`         | `1300`, `1301`         |
+| `{n,m}`  | Insert between `n` and `m` times.                                                               | `\d{2,4}`         | `12`, `4321`           |
+| `[abc]`  | Insert any one of the characters `a`, `b`, or `c`.                                              | `[abc]{3}`        | `abc`, `cab`           |
+| `[^abc]` | Insert any character except `a`, `b`, or `c`.                                                   | `[^abc]{3}`       | `xyz`, `123`           |
+| `[a-z]`  | Insert any character in the range from `a` to `z`.                                              | `[a-z]{3}`        | `abc`, `xyz`           |
+| `[0-9]{n:z}`  | Insert any number in the range from `0` to `9`, `n` times with `z` of leading zero.        | `[0-9]{3:5}`      | `00827`, `00281`           |
+| `\i` or `\i+`    | Insert an incrementing value, starting from the specified value and increasing with each use.  | `\i+\d\d`         | `1300`, `1301`         |
 | `\i-`    | Insert a decrementing value, starting from the specified value and decreasing with each use.   | `\i-\d\d`         | `1299`, `1298`         |
+| `\i{:z}`    | Insert a incrementing value, starting from the specified value and leading zero.   | `\i{:6}`         | `001299`, `001298`         |
 | `\a`     | Insert a random string from an array of values.                                                | `\a`              | `apple`, `banana`      |
 | `\a+`    | Insert a string from an array in ascending order.                                              | `\a+`             | `apple`, `banana`      |
 | `\a-`    | Insert a string from an array in descending order.                                             | `\a-`             | `cherry`, `banana`     |
 | `()`     | Group characters.                                                                              | `(\d\d)`          | `42`                   |
 | `\1`     | Backreference to the first captured group.                                                     | `(\d\d)\1`        | `4242`                 |
-| `|`      | Alternation; match either the expression before or the expression after.                       | `a|b`             | `a`, `b`               |
+| `|`      | Alternation; insert either the expression before or the expression after.                       | `a|b`             | `a`, `b`               |
 
 ## Testing
 
