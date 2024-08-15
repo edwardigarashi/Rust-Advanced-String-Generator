@@ -9,7 +9,7 @@ repository = "https://github.com/edwardigarashi/Rust-Advanced-String-Generator"
 documentation = "https://igarashi.net/rust-advanced-string-generator/"
 readme = "README.md"
 keywords = ["regex", "generator", "cli", "rust"]
-categories = ["command-line-utilities", "text-processing", "development-tools::build-systems"]
+categories = ["command-line-utilities", "text-processing", "development-tools"]
 
 [lib]
 crate-type = ["cdylib", "rlib"]
