@@ -13,18 +13,21 @@ This project provides a powerful and flexible string generator based on regex-li
 - **Group Capturing and Backreferences**: Capture groups of characters and reference them later in the pattern.
 - **WASM Support**: Compile the project to WebAssembly and use it in a web environment.
 
+
 ## Installation
 
-### For Native Rust
-
-1. Add this project as a dependency in your `Cargo.toml`:
-
-```toml
-[dependencies]
-rust_advanced_string_generator = "0.1.0"
-```
-
-2. Run your project with `cargo run` or use the library in your Rust application.
+1. **Clone the repository**:
+    ```sh
+    git clone https://github.com/your-repo/regex_generator.git
+    ```
+2. **Navigate to the project directory**:
+    ```sh
+    cd regex_generator
+    ```
+3. **Build the project**:
+    ```sh
+    cargo build --release
+    ```
 
 ### For WebAssembly
 
@@ -42,22 +45,31 @@ wasm-pack build --target web --features wasm
 
 3. Use the generated WebAssembly module in your web project.
 
+
 ## Usage
 
-### Rust Example
-
-```rust
-use rust_advanced_string_generator::RegexGenerator;
-
-fn main() {
-    let pattern = r"\i+\d\d";
-    let mut generator = RegexGenerator::new(pattern, Some("1299".to_string()), None);
-
-    for _ in 0..5 {
-        println!("Generated: {}", generator.generate());
-    }
-}
+```sh
+regex_generator [OPTIONS] PATTERN [INCREMENT] [ARRAY]
 ```
+
+
+### Examples
+
+1. **Generate a string with an incrementing value with leading zeros**:
+    ```sh
+    ./target/release/regex_generator -p '\\i{:10}' -i 43
+    ```
+
+2. **Generate a random string from an array**:
+    ```sh
+    ./target/release/regex_generator -p '[A-Za-z]{5}' -a 'apple,banana,grape'
+    ```
+
+3. **Use a combination of patterns**:
+    ```sh
+    ./target/release/regex_generator -p '\\w{3}-\\d{2:5}-\\i{:6}' -i 100 -a 'cat,dog,mouse'
+    ```
+
 
 ### WASM Example
 
@@ -74,6 +86,16 @@ async function run() {
 
 run();
 ```
+
+### Options
+
+| Option               | Description                                                |
+|----------------------|------------------------------------------------------------|
+| `-h`, `--help`       | Prints help information                                    |
+| `-v`, `--version`    | Prints version information                                 |
+| `-p`, `--pattern`    | Specifies the pattern to use                               |
+| `-i`, `--increment`  | Initial value for the increment (optional)                 |
+| `-a`, `--array`      | Array of strings (comma-separated) for `/a` pattern (optional) |
 
 ## Supported Patterns
 
@@ -128,10 +150,31 @@ To build and test the WebAssembly version, follow these steps:
    python3 -m http.server
    ```
 
+
+## Help
+
+To get help information, run:
+
+```sh
+./target/release/regex_generator -h
+```
+
+## Version
+
+To check the version of the tool, run:
+
+```sh
+./target/release/regex_generator -v
+```
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
----
+## Contributing
 
+Contributions are welcome! Please submit a pull request or create an issue to report bugs or suggest features.
+
+---
 This `README.md` file provides comprehensive documentation for the `RegexGenerator` project, including installation instructions, usage examples, a detailed list of supported patterns, and testing instructions.
+
