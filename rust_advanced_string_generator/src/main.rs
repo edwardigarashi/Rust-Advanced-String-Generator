@@ -3,71 +3,13 @@ mod regex_generator;  // Import the module that contains RegexGenerator
 use regex_generator::RegexGenerator;
 
 fn main() {
-    // Example patterns to test different functionalities
-
-    // Test incrementing
-    let mut generator = RegexGenerator::new(r"\i+\d\d", Some("1299".to_string()), None);
-    for _ in 0..5 {
-        println!("Generated: {}", generator.generate());
-    }
-
-    // Test array handling with random selection
-    let array_values = Some(vec!["apple".to_string(), "banana".to_string(), "cherry".to_string()]);
-    let mut generator = RegexGenerator::new(r"\a", None, array_values);
-    for _ in 0..5 {
-        println!("Generated: {}", generator.generate());
-    }
-
-    // Test array handling with ascending order
-    let array_values = Some(vec!["apple".to_string(), "banana".to_string(), "cherry".to_string()]);
-    let mut generator = RegexGenerator::new(r"\a+", None, array_values);
-    for _ in 0..5 {
-        println!("Generated: {}", generator.generate());
-    }
-
-    // Test array handling with descending order
-    let array_values = Some(vec!["apple".to_string(), "banana".to_string(), "cherry".to_string()]);
-    let mut generator = RegexGenerator::new(r"\a-", None, array_values);
-    for _ in 0..5 {
-        println!("Generated: {}", generator.generate());
-    }
-
-    // Test combined increment and array handling
-    let array_values = Some(vec!["apple".to_string(), "banana".to_string(), "cherry".to_string()]);
-    let mut generator = RegexGenerator::new(r"\a+\i+\d\d", Some("1299".to_string()), array_values);
-    for _ in 0..5 {
-        println!("Generated: {}", generator.generate());
-    }
-
-    // Test character classes
-    let mut generator = RegexGenerator::new(r"\d\w\s", None, None);
-    for _ in 0..5 {
-        println!("Generated: {}", generator.generate());
-    }
-
-    // Test custom repeat
-    let mut generator = RegexGenerator::new(r"\d{2,4}", None, None);
-    for _ in 0..5 {
-        println!("Generated: {}", generator.generate());
-    }
-
-    // Test character ranges
-    let mut generator = RegexGenerator::new(r"[a-c]{3}", None, None);
-    for _ in 0..5 {
-        println!("Generated: {}", generator.generate());
-    }
-
-    // Test character negation
-    let mut generator = RegexGenerator::new(r"[^a-c]{3}", None, None);
-    for _ in 0..5 {
-        println!("Generated: {}", generator.generate());
-    }
-
+    
     // Test group capturing and backreference
-    let mut generator = RegexGenerator::new(r"(\d\d)\+(\d\d)=\2\+\1", None, None);
+    let mut generator = RegexGenerator::new(r"\i{:10}", Some("9998".to_string()), None);
     for _ in 0..5 {
         println!("Generated: {}", generator.generate());
     }
+
 }
 
 
@@ -243,5 +185,34 @@ mod tests {
             assert_eq!(left_side[0], right_side[1]);
         }
     }
+    #[test]
+    fn test_leading_zero(){
+        let pattern: &str = r"[0-9]{3:10}";
+        let increment_value = None;
+        let mut generator = RegexGenerator::new(pattern, increment_value, None);
+        for _ in 0..5 {
+            let generated = generator.generate();
+            assert!(generated.len() == 10);
+            assert!(generated.chars().nth(6).unwrap() == '0');
+
+        }
+
+    }
+
+    #[test]
+    fn test_increment_leading_zero(){
+        let pattern:&str = r"\i{:5}";
+        let increment_value = Some("998".to_string());
+        let mut generator = RegexGenerator::new(pattern, increment_value, None);
+        let expected_results = vec!["00999", "01000", "01001", "01002", "01003"];
+        for expected in expected_results {
+            let generated = generator.generate();
+            assert_eq!(generated, expected);
+        }
+
+    }
+
+
+
 }
 

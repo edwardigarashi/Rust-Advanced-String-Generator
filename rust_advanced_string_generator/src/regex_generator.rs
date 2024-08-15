@@ -48,8 +48,28 @@ impl RegexGenerator {
 
                             self.direction = sign;
 
+                            // Check for leading zero specifier {:total_len}
+                            
+                            let total_len = if chars.peek() == Some(&'{') {
+                                chars.next(); // Skip the '{'
+                                let mut spec = String::new();
+                                while let Some(&c) = chars.peek() {
+                                    if c == '}' {
+                                        chars.next(); // Skip the '}'
+                                        break;
+                                    }
+                                    if c != ':' && c.is_numeric() {
+                                        spec.push(c);
+                                    }
+                                    chars.next();
+                                }
+                                spec.parse::<usize>().ok()
+                            } else {
+                                None
+                            };
+
                             if let Some(increment_value) = self.increment_value.take() {
-                                let new_value = self.increment_string(&increment_value);
+                                let new_value = self.increment_string(&increment_value, total_len);
                                 result.push_str(&new_value);
                                 self.increment_value = Some(new_value);
                             } else {
@@ -112,7 +132,7 @@ impl RegexGenerator {
                 if let Some(repeat_spec) = self.check_repeat_spec(&mut chars) {
                     result.push_str(&self.handle_bracket(char_class, repeat_spec, negate));
                 } else {
-                    result.push_str(&self.handle_bracket(char_class, (1, None), negate));
+                    result.push_str(&self.handle_bracket(char_class, (1, None, None), negate));
                 }
             } else if ch == '(' {
                 if chars.peek() == Some(&'?') {
@@ -154,7 +174,7 @@ impl RegexGenerator {
         result
     }
 
-    fn check_repeat_spec<I>(&self, chars: &mut std::iter::Peekable<I>) -> Option<(usize, Option<usize>)>
+    fn check_repeat_spec<I>(&self, chars: &mut std::iter::Peekable<I>) -> Option<(usize, Option<usize>, Option<(usize, usize)>)>
     where
         I: Iterator<Item = char>,
     {
@@ -171,11 +191,19 @@ impl RegexGenerator {
                 chars.next();
             }
 
-            let parts: Vec<&str> = spec.split(',').collect();
-            if parts.len() == 1 {
-                return Some((parts[0].parse().unwrap(), None));
-            } else if parts.len() == 2 {
-                return Some((parts[0].parse().unwrap(), Some(parts[1].parse().unwrap())));
+            if let Some(colon_pos) = spec.find(':') {
+                // Handle leading zeros pattern {num_len:total_len}
+                let num_len = spec[..colon_pos].parse().ok()?;
+                let total_len = spec[colon_pos + 1..].parse().ok()?;
+                return Some((1, None, Some((num_len, total_len))));
+            } else {
+                // Handle regular repeat pattern {min,max}
+                let parts: Vec<&str> = spec.split(',').collect();
+                if parts.len() == 1 {
+                    return Some((parts[0].parse().unwrap(), None, None));
+                } else if parts.len() == 2 {
+                    return Some((parts[0].parse().unwrap(), Some(parts[1].parse().unwrap()), None));
+                }
             }
         }
 
@@ -213,8 +241,8 @@ impl RegexGenerator {
         }
     }
 
-    fn handle_repeat(&self, ch: char, repeat_spec: (usize, Option<usize>)) -> String {
-        let (min, max) = repeat_spec;
+    fn handle_repeat(&self, ch: char, repeat_spec: (usize, Option<usize>, Option<(usize, usize)>)) -> String {
+        let (min, max, leading_zeros_spec) = repeat_spec;
         let mut rng = rand::thread_rng();
         let repeat_count = if let Some(max) = max {
             rng.gen_range(min..=max)
@@ -222,9 +250,16 @@ impl RegexGenerator {
             min
         };
 
-        std::iter::repeat(self.handle_escape(ch))
-            .take(repeat_count)
-            .collect()
+        if let Some((num_len, total_len)) = leading_zeros_spec {
+            // Handle leading zeros pattern
+            let number = rng.gen_range(10_usize.pow((num_len - 1) as u32)..10_usize.pow(num_len as u32));
+            return format!("{:0width$}", number, width = total_len);
+        } else {
+            // Handle regular repeat pattern
+            return std::iter::repeat(self.handle_escape(ch))
+                .take(repeat_count)
+                .collect();
+        }
     }
 
     fn extract_char_class<I>(&self, chars: &mut std::iter::Peekable<I>) -> (HashSet<char>, bool)
@@ -260,8 +295,8 @@ impl RegexGenerator {
         (char_class, negate)
     }
 
-    fn handle_bracket(&self, char_class: HashSet<char>, repeat_spec: (usize, Option<usize>), negate: bool) -> String {
-        let (min, max) = repeat_spec;
+    fn handle_bracket(&self, char_class: HashSet<char>, repeat_spec: (usize, Option<usize>, Option<(usize, usize)>), negate: bool) -> String {
+        let (min, max, leading_zeros_spec) = repeat_spec;
         let mut rng = rand::thread_rng();
         let repeat_count = if let Some(max) = max {
             rng.gen_range(min..=max)
@@ -269,22 +304,27 @@ impl RegexGenerator {
             min
         };
 
-        let sample_set: Vec<char> = if negate {
-            let full_set: HashSet<char> = (32..127).map(|c| c as u8 as char).collect();
-            full_set.difference(&char_class).cloned().collect()
+        if let Some((num_len, total_len)) = leading_zeros_spec {
+            // Handle leading zeros pattern
+            let number = rng.gen_range(10_usize.pow((num_len - 1) as u32)..10_usize.pow(num_len as u32));
+            return format!("{:0width$}", number, width = total_len);
         } else {
-            char_class.into_iter().collect()
-        };
+            let sample_set: Vec<char> = if negate {
+                let full_set: HashSet<char> = (32..127).map(|c| c as u8 as char).collect();
+                full_set.difference(&char_class).cloned().collect()
+            } else {
+                char_class.into_iter().collect()
+            };
 
-        (0..repeat_count)
-            .map(|_| sample_set[rng.gen_range(0..sample_set.len())])
-            .collect()
+            return (0..repeat_count)
+                .map(|_| sample_set[rng.gen_range(0..sample_set.len())])
+                .collect();
+        }
     }
 
-    fn increment_string(&self, value: &str) -> String {
+    fn increment_string(&self, value: &str, total_len: Option<usize>) -> String {
         let mut prefix = String::new();
         let mut digits = String::new();
-
         // Separate prefix and numeric part
         for ch in value.chars() {
             if ch.is_digit(10) {
@@ -301,7 +341,11 @@ impl RegexGenerator {
         // Adjust numeric part based on the direction (ascending or descending)
         if let Ok(num) = digits.parse::<i32>() {
             let adjusted_num = num + self.direction;
-            digits = format!("{:0width$}", adjusted_num, width = digits.len());
+            digits = if let Some(total_len) = total_len {
+                format!("{:0width$}", adjusted_num, width = total_len)
+            } else {
+                format!("{}", adjusted_num)
+            };
         }
 
         // Combine prefix and adjusted numeric part
