@@ -2,6 +2,11 @@
 
 This project provides a powerful and flexible string generator based on regex-like patterns, with support for features such as character classes, custom repeats, array-based string selection, incremental values, and more. The application can be compiled and used both as a native Rust library and in a WebAssembly (WASM) context.
 
+## Demo
+
+Demo for this project below
+https://igarashi.net/rust-advanced-string-generator/
+
 ## Features
 
 - **Character Classes**: Supports `\d`, `\w`, `\s`, `\D`, `\W`, `\S`, etc.
