@@ -7,7 +7,7 @@ description = "A command-line tool for generating strings based on customizable 
 license = "MIT" # Your chosen license, such as MIT, Apache-2.0, etc.
 repository = "https://github.com/edwardigarashi/Rust-Advanced-String-Generator"
 documentation = "https://igarashi.net/rust-advanced-string-generator/"
-readme = "README.md" # Path to your README file
+readme = "README.md"
 keywords = ["regex", "generator", "cli", "rust"]
 categories = ["command-line-utilities", "text-processing", "development-tools::build-systems"]
 
